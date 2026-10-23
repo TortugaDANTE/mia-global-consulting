@@ -4,30 +4,20 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-concurrency:
-  group: pages
-  cancel-in-progress: true
+  contents: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.d.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Decode binary assets
+      - name: Decode assets and publish to gh-pages
         run: |
           cat bundle/assets.b64.part* | base64 -d | tar xz
-          rm -rf bundle
-          rm -rf .github
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-      - id: d
-        uses: actions/deploy-pages@v4
+          rm -rf bundle .github README.md
+          touch .nojekyll
+          rm -rf .git
+          git init -b gh-pages
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A && git commit -m "Publicar sitio"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
