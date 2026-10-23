@@ -22,9 +22,19 @@ jobs:
             git commit -m "Recursos binarios reales (img/, fonts/)"
             git push origin HEAD:main
           fi
+      - name: Decodificar app AR en ar/ (no toca img/ ni fonts/)
+        run: |
+          if ls ar_bundle/ar.b64.part* >/dev/null 2>&1; then
+            rm -rf ar
+            cat ar_bundle/ar.b64.part* | base64 -d | tar xz
+            git rm -rq ar_bundle
+            git add -A ar
+            git commit -m "App AR: archivos binarios reales (ar/)"
+            git push origin HEAD:main
+          fi
       - name: Publicar gh-pages
         run: |
-          rm -rf .github README.md bundle .git
+          rm -rf .github README.md bundle ar_bundle .git
           touch .nojekyll
           git init -q -b gh-pages
           git config user.name "github-actions"
