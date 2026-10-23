@@ -71,3 +71,6 @@ footer{background:#fff;text-align:center;padding:2.5rem 1rem;border-top:4px soli
  .poll{grid-template-columns:1fr 1fr}.gal{grid-template-columns:1fr 1fr}
 }
 @media (max-width:480px){.poll,.gal{grid-template-columns:1fr}}
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-top:2rem}
+.strip img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px}
+.strip img:nth-child(6){grid-column:span 2;aspect-ratio:2/1}
