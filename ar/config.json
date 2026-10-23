@@ -1,6 +1,7 @@
 {
-  "nota": "Agrega aquí los 10 videos MIA (MP4 H.264 720p, <8 MB, en ar/videos/ o URL https con CORS). La TV de la pared fondo reproduce la lista; 'pared' indica el tema.",
+  "nota": "Agrega aquí los 10 videos MIA (MP4 H.264 720p, <8 MB, en ar/videos/). 'subtitulos' se muestran en la TV, uno cada 3.5 s.",
   "videos": [
-    {"tema": 4, "pared": "fondo", "titulo": "Video MIA · próximamente", "src": "videos/placeholder.mp4"}
+    {"tema": 4, "titulo": "Del diagnóstico a la autogestión", "src": "videos/placeholder.mp4",
+     "subtitulos": ["Leemos el terreno con modelos 3D.", "Lo confirmamos en campo con la comunidad.", "Cada etapa con evidencia."]}
   ]
 }
