@@ -2,8 +2,7 @@ const m=document.querySelector('.menu'),nv=document.querySelector('.nav nav');
 m.onclick=()=>{nv.classList.toggle('open');m.setAttribute('aria-expanded',nv.classList.contains('open'))};
 nv.querySelectorAll('a').forEach(a=>a.onclick=()=>nv.classList.remove('open'));
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.12});
-document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-const bg=document.querySelector('.hero-bg');addEventListener('scroll',()=>{bg.style.transform=`translateY(${scrollY*.25}px)`},{passive:true});
+document.querySelectorAll('.fade').forEach(el=>io.observe(el));
 // Encuesta: guarda elecciones solo en este navegador (localStorage); no hay estadísticas inventadas.
 const K='mia_poll_v1',btns=[...document.querySelectorAll('.poll button')],msg=document.getElementById('pollmsg');
 const load=()=>JSON.parse(localStorage.getItem(K)||'{"votes":{},"mine":null}');
