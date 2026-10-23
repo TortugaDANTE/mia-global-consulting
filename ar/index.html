@@ -24,13 +24,13 @@ button,.btn{font:700 16px system-ui;border:0;border-radius:8px;padding:12px 16px
 <p>Apunta la cámara a la <b>imagen ancla</b> de cualquiera de los 3 carteles. Cualquier cartel coloca el stand completo; con varios a la vista se vuelve más estable. Toca los objetos que flotan.</p>
 <p><button id="bIniciar">Iniciar cámara</button></p><p><a class="btn k" href="visor.html">Ver sin cámara</a></p></div>
 <div id="estado">listo</div>
+<video id="tv" crossorigin="anonymous" playsinline webkit-playsinline muted loop preload="none" style="display:none"></video>
 <div id="panel"><button class="x k" onclick="cerrar()">✕</button><div id="pc"></div></div>
 <div id="bar"><button onclick="explorar()">Explorar</button><button class="k" id="bSon">🔈 Sonido TV</button>
 <a class="btn" style="background:#25D366" href="https://wa.me/524441749695" target="_blank">WhatsApp</a>
 <a class="btn" href="mailto:danae@miaglobalconsulting.com">Correo</a>
 <a class="btn k" href="https://tortugadante.github.io/mia-global-consulting/" target="_blank">Web</a></div>
-<a-scene id="escena" mindar-image="autoStart: false; uiScanning: no; uiLoading: no" color-space="sRGB" renderer="colorManagement: true; antialias: false; precision: mediump" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
- <a-assets><video id="tv" crossorigin="anonymous" playsinline webkit-playsinline muted loop preload="auto"></video></a-assets>
+<a-scene id="escena" mindar-image="autoStart: false; uiScanning: yes; uiLoading: yes" color-space="sRGB" renderer="colorManagement: true; antialias: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
  <a-camera fix-raycast-mindar position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse" raycaster="objects: .clicable; far: 100000; interval: 100"></a-camera>
  <a-entity id="stand" fusion-stand visible="false"></a-entity>
  <a-entity id="t0" mindar-image-target="targetIndex: 0"></a-entity>
@@ -39,6 +39,8 @@ button,.btn{font:700 16px system-ui;border:0;border-radius:8px;padding:12px 16px
 </a-scene>
 <script src="js/stand.js"></script>
 <script>
+window.onerror=(m,u,l)=>{const e=document.getElementById('estado');if(e)e.textContent='Error: '+m+' ('+(u||'').split('/').pop()+':'+l+')';};
+window.addEventListener('unhandledrejection',ev=>{const e=document.getElementById('estado');if(e)e.textContent='Error: '+(ev.reason&&ev.reason.message||ev.reason);});
 const $=s=>document.querySelector(s),sc=$('#escena'),estado=t=>$('#estado').textContent=t;
 const vis=new Set(),N=['Quiénes somos','Cómo trabajamos','Qué ofrecemos'];
 construirStand($('#stand'),abrir);
@@ -47,11 +49,16 @@ construirStand($('#stand'),abrir);
  t.addEventListener('targetLost',()=>{vis.delete(i);upd();});});
 function upd(){estado(vis.size?('Viendo: '+[...vis].map(i=>N[i]).join(' · ')+(vis.size==3?' — ¡stand completo!':'')):'Buscando carteles… apunta a la imagen ancla');}
 $('#bSon').onclick=()=>{const v=$('#tv');v.muted=!v.muted;v.play().catch(()=>{});$('#bSon').textContent=v.muted?'🔈 Sonido TV':'🔊 Silenciar';};
+sc.addEventListener('arError',()=>estado('No se pudo abrir la cámara. Revisa permisos del navegador (HTTPS) o usa “Ver sin cámara”.'));
 $('#bIniciar').onclick=async()=>{$('#intro').classList.add('oculto');estado('cargando…');
  const v=$('#tv');v.play().then(()=>v.pause()).catch(()=>{});
  try{if(!window.isSecureContext)throw new Error('se requiere HTTPS');
   const sys=sc.systems['mindar-image-system'];
-  sys.setup({imageTargetSrc:'targets/carteles.mind',maxTrack:2,filterMinCF:0.0001,filterBeta:0.001,missTolerance:10,warmupTolerance:3,showStats:false,uiLoading:'no',uiScanning:'no',uiError:'yes'});
+  estado('descargando marcadores (2.4 MB)…');
+  const r=await fetch('targets/carteles.mind',{cache:'force-cache'});if(!r.ok)throw new Error('carteles.mind HTTP '+r.status);
+  const buf=await r.arrayBuffer();if(buf.byteLength<100000)throw new Error('carteles.mind incompleto');
+  const url=URL.createObjectURL(new Blob([buf],{type:'application/octet-stream'}));
+  sys.setup({imageTargetSrc:url,maxTrack:3,filterMinCF:0.001,filterBeta:10,missTolerance:5,warmupTolerance:2,showStats:false,uiLoading:'yes',uiScanning:'yes',uiError:'yes'});
   estado('pidiendo cámara…');await sys.start();upd();
  }catch(e){estado('error: '+(e&&e.message||e));}
 };
