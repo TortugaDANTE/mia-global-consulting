@@ -48,7 +48,7 @@ button.card:hover{background:var(--o)}button.card:focus-visible,#sl button:focus
 dialog#sl{width:min(1200px,96vw);max-height:96vh;border:0;padding:1rem;background:var(--k);color:var(--w);border-radius:12px}dialog#sl::backdrop{background:rgba(31,31,31,.92)}
 .slhead{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}.slhead h2{color:var(--o);font-size:clamp(1.4rem,4vw,2rem);margin:0}
 #slc,.slnav button{font:800 1.3rem Poppins,sans-serif;background:var(--o);color:var(--k);border:3px solid var(--o);border-radius:8px;min-height:52px;min-width:64px;padding:.3em .9em;cursor:pointer;flex:none}
-.slnav button:disabled{background:var(--k);color:var(--w);border-color:var(--w);opacity:.5;cursor:default}
+.slnav button:disabled{background:var(--w);color:var(--k);border:3px dashed var(--k);cursor:default}
 .slnav{display:flex;justify-content:center;align-items:center;gap:1.2rem;font-size:1.3rem;font-weight:800}
 .proj .btn{font-size:1.15rem}
 .deck{margin:1rem 0}.slides{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;gap:0;border-radius:12px}.slides::-webkit-scrollbar{display:none}
@@ -60,3 +60,4 @@ dialog#sl{width:min(1200px,96vw);max-height:96vh;border:0;padding:1rem;backgroun
 .slide .btn{align-self:flex-start;margin-top:1rem}
 .slogo{position:absolute;right:1rem;bottom:.8rem;height:52px;width:auto;border-radius:6px}.snum{position:absolute;left:1.5rem;bottom:1.1rem;font:800 1.1rem Poppins,sans-serif}
 #slv .slide{min-height:min(62vh,520px)}
+.hero:not(:has(img)){grid-template-columns:1fr !important}h1.big{max-width:16ch}
