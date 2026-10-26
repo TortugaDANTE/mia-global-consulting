@@ -35,3 +35,10 @@ details.ex summary{margin:0}
 @media(min-width:900px){.gal{grid-template-columns:repeat(3,1fr)}}
 dialog#lb{border:0;padding:1rem;max-width:95vw;max-height:95vh;background:var(--k);color:var(--w);border-radius:12px}dialog#lb::backdrop{background:rgba(0,0,0,.85)}
 #lbi{max-width:90vw;max-height:78vh;margin:0 auto}#lbt{font-size:1.3rem;margin:.6rem 0 0}#lbc{font:800 1.3rem Poppins,sans-serif;background:var(--o);color:var(--k);border:0;border-radius:8px;padding:.5em 1em;margin-bottom:.6rem;cursor:pointer;min-height:48px}
+h1.big{font-size:clamp(2.8rem,9vw,5.6rem);line-height:1.05;letter-spacing:-.01em}.hl{box-shadow:inset 0 -.28em 0 var(--o)}
+.ls{color:var(--k);background:var(--o);padding:0 .3em;border-radius:4px}
+.btn.line{background:var(--w)}
+details.star{border:4px solid var(--k);border-top:14px solid var(--o);background:#FFF1E8}details.star summary h2{font-size:clamp(1.9rem,4vw,2.6rem)}details.star .list{font-size:1.5rem}
+.ingal{margin:1.5rem 0}.ingal .gal img{border-radius:8px}
+footer{padding:1.5rem 0}footer p{margin:0;font-size:1.1rem}
+@media(min-width:900px){.hero.home,.hero:has(h1.big){grid-template-columns:1.6fr 1fr}.two{grid-template-columns:1.35fr 1fr}}
