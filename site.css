@@ -21,3 +21,5 @@ footer{background:var(--k);color:var(--w);padding:2.5rem 0;margin-top:2rem}foote
 @media(min-width:900px){.menu{display:none}.top nav{display:flex;flex-direction:row;width:auto;gap:1.2rem;flex-wrap:wrap;justify-content:flex-end;max-width:900px}.top nav a{border:0;font-size:1.1rem}
 .hero{grid-template-columns:1.2fr 1fr;align-items:center}.grid{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:repeat(3,1fr)}.contact{grid-template-columns:1fr auto}}
 @media(min-width:1200px){.grid{grid-template-columns:repeat(4,1fr)}}
+.two{display:grid;gap:1rem;padding-bottom:1rem}a.box{text-decoration:none;display:block}.box .list{font-size:1.3rem}.box.dark h2{color:var(--o)}
+@media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
