@@ -49,7 +49,14 @@ dialog#sl{width:min(1200px,96vw);max-height:96vh;border:0;padding:1rem;backgroun
 .slhead{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}.slhead h2{color:var(--o);font-size:clamp(1.4rem,4vw,2rem);margin:0}
 #slc,.slnav button{font:800 1.3rem Poppins,sans-serif;background:var(--o);color:var(--k);border:3px solid var(--o);border-radius:8px;min-height:52px;min-width:64px;padding:.3em .9em;cursor:pointer;flex:none}
 .slnav button:disabled{background:var(--k);color:var(--w);border-color:var(--w);opacity:.5;cursor:default}
-.slv{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:.8rem 0;scrollbar-width:none}.slv::-webkit-scrollbar{display:none}
-.sli{flex:0 0 100%;scroll-snap-align:center;margin:0;text-align:center}.sli img{max-height:68vh;width:auto;max-width:100%;margin:0 auto;background:var(--w);border-radius:8px}
-.sli figcaption{font-size:1.15rem;margin-top:.5rem;color:var(--w)}
 .slnav{display:flex;justify-content:center;align-items:center;gap:1.2rem;font-size:1.3rem;font-weight:800}
+.proj .btn{font-size:1.15rem}
+.deck{margin:1rem 0}.slides{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;gap:0;border-radius:12px}.slides::-webkit-scrollbar{display:none}
+.slides:focus-visible{outline:4px solid var(--o);outline-offset:3px}
+.slide{position:relative;flex:0 0 100%;scroll-snap-align:start;background:var(--w);color:var(--k);border:3px solid var(--k);border-radius:12px;padding:2rem 1.5rem 4.5rem;min-height:min(70vh,560px);display:flex;flex-direction:column;justify-content:center;font-size:clamp(1.3rem,2.6vw,1.8rem);line-height:1.45}
+.slide .sbar{position:absolute;left:0;top:0;width:100%;height:14px;background:var(--o);border-radius:9px 9px 0 0}
+.slide h2{font-size:clamp(1.9rem,5vw,3.2rem);margin-bottom:.6em}.slide p{margin:.3em 0;padding-left:.8em;border-left:6px solid var(--o)}
+.slide.cover{background:var(--k);color:var(--w)}.slide.cover h2{color:var(--o)}.slide.end{background:var(--o)}.slide.end p{border-color:var(--k)}
+.slide .btn{align-self:flex-start;margin-top:1rem}
+.slogo{position:absolute;right:1rem;bottom:.8rem;height:52px;width:auto;border-radius:6px}.snum{position:absolute;left:1.5rem;bottom:1.1rem;font:800 1.1rem Poppins,sans-serif}
+#slv .slide{min-height:min(62vh,520px)}
