@@ -31,3 +31,7 @@ details.box[open] summary::after{content:"−"}
 details.box summary:focus-visible{outline:4px solid var(--o);outline-offset:4px}
 details.box.dark a{color:var(--w)}details.box.dark .btn{color:var(--k)}details.box .btn{margin-top:.5rem}
 details.ex summary{margin:0}
+.gal{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}.gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px}.gi:focus-visible{outline:4px solid var(--o);outline-offset:3px}
+@media(min-width:900px){.gal{grid-template-columns:repeat(3,1fr)}}
+dialog#lb{border:0;padding:1rem;max-width:95vw;max-height:95vh;background:var(--k);color:var(--w);border-radius:12px}dialog#lb::backdrop{background:rgba(0,0,0,.85)}
+#lbi{max-width:90vw;max-height:78vh;margin:0 auto}#lbt{font-size:1.3rem;margin:.6rem 0 0}#lbc{font:800 1.3rem Poppins,sans-serif;background:var(--o);color:var(--k);border:0;border-radius:8px;padding:.5em 1em;margin-bottom:.6rem;cursor:pointer;min-height:48px}
