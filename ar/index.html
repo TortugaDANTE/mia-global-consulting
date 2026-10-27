@@ -10,7 +10,7 @@
 <h1>Proyectos de impacto que suceden de verdad.</h1>
 <p>Ecotecnias, formación y acompañamiento para empresas y fundaciones, desde el diagnóstico hasta la autogestión.</p>
 <p><button id="bIniciar" class="cta">Recorre el stand →</button></p>
-<p>Apunte la cámara a la ilustración de cualquiera de los 3 carteles. <a href="visor.html">Ver sin cámara</a></p>
+<p>Apunte la cámara al display completo de MIA. <a href="visor.html">Ver sin cámara</a></p>
 <p><a class="peq" target="_blank" href="https://wa.me/524441749695?text=Hola%2C%20vi%20el%20stand%20virtual%20de%20MIA%20y%20me%20interesa%20conversar">Hablar ahora por WhatsApp</a></p></div>
 <div id="estado">listo</div>
 <video id="tv" crossorigin="anonymous" playsinline webkit-playsinline muted loop preload="none" style="display:none"></video>
@@ -21,31 +21,29 @@
  <a-camera fix-raycast-mindar position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse" raycaster="objects: .clicable, .clicable *; far: 100000; interval: 100"></a-camera>
  <a-entity id="stand" fusion-stand visible="false"></a-entity>
  <a-entity id="t0" mindar-image-target="targetIndex: 0"></a-entity>
- <a-entity id="t1" mindar-image-target="targetIndex: 1"></a-entity>
- <a-entity id="t2" mindar-image-target="targetIndex: 2"></a-entity>
 </a-scene>
 <script src="js/stand.js"></script>
 <script>
 window.onerror=(m,u,l)=>{const e=document.getElementById('estado');if(e)e.textContent='Error: '+m+' ('+(u||'').split('/').pop()+':'+l+')';};
 window.addEventListener('unhandledrejection',ev=>{const e=document.getElementById('estado');if(e)e.textContent='Error: '+(ev.reason&&ev.reason.message||ev.reason);});
 const $=s=>document.querySelector(s),sc=$('#escena'),estado=t=>$('#estado').textContent=t;
-const vis=new Set(),N=['Quiénes somos','Cómo trabajamos','Qué ofrecemos'];
+const vis=new Set();
 document.fonts.load('800 40px Poppins').then(()=>document.fonts.load('700 40px Poppins')).catch(()=>{}).finally(()=>construirStand($('#stand')));
-[0,1,2].forEach(i=>{const t=$('#t'+i);
+[0].forEach(i=>{const t=$('#t'+i);
  t.addEventListener('targetFound',()=>{vis.add(i);window.encontrado=1;upd();$('#tv').play().catch(()=>{});});
  t.addEventListener('targetLost',()=>{vis.delete(i);upd();});});
-function upd(){estado(vis.size?('Viendo: '+[...vis].map(i=>N[i]).join(' · ')+(vis.size==3?' — ¡stand completo!':'')):'Buscando carteles… apunte a la ilustración de un cartel');}
+function upd(){estado(vis.size?'Viendo el display — toque los paneles flotantes':'Buscando el display… apunte al display completo de MIA');}
 $('#bSon').onclick=()=>{const v=$('#tv');v.muted=!v.muted;v.play().catch(()=>{});$('#bSon').textContent=v.muted?'🔈 Sonido TV':'🔊 Silenciar';};
 sc.addEventListener('arError',()=>estado('No se pudo abrir la cámara. Revisa permisos del navegador (HTTPS) o usa “Ver sin cámara”.'));
 $('#bIniciar').onclick=async()=>{$('#intro').classList.add('oculto');estado('cargando…');
  const v=$('#tv');v.play().then(()=>v.pause()).catch(()=>{});
  try{if(!window.isSecureContext)throw new Error('se requiere HTTPS');
   const sys=sc.systems['mindar-image-system'];
-  estado('descargando marcadores (2.4 MB)…');
-  const r=await fetch('targets/carteles.mind',{cache:'force-cache'});if(!r.ok)throw new Error('carteles.mind HTTP '+r.status);
-  const buf=await r.arrayBuffer();if(buf.byteLength<100000)throw new Error('carteles.mind incompleto');
+  estado('descargando marcador…');
+  const r=await fetch('targets/display.mind',{cache:'no-cache'});if(!r.ok)throw new Error('display.mind HTTP '+r.status);
+  const buf=await r.arrayBuffer();if(buf.byteLength<1000)throw new Error('display.mind incompleto');
   const url=URL.createObjectURL(new Blob([buf],{type:'application/octet-stream'}));
-  sys.setup({imageTargetSrc:url,maxTrack:3,filterMinCF:0.001,filterBeta:10,missTolerance:5,warmupTolerance:2,showStats:false,uiLoading:'yes',uiScanning:'yes',uiError:'yes'});
+  sys.setup({imageTargetSrc:url,maxTrack:1,filterMinCF:0.001,filterBeta:10,missTolerance:5,warmupTolerance:2,showStats:false,uiLoading:'yes',uiScanning:'yes',uiError:'yes'});
   estado('pidiendo cámara…');await sys.start();upd();
  }catch(e){estado('error: '+(e&&e.message||e));}
 };

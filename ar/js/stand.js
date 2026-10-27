@@ -1,8 +1,9 @@
-// MIA · Stand AR v3 — un stand de feria de 3x3 m "real" + capa de hologramas interactivos.
-// Coordenadas de sala en METROS: piso y=0, muro de fondo z=0, sala x∈[-1.5,1.5], z∈[0,3].
-// Unidades MindAR = ancho de la imagen ancla (0.254 m) -> U unidades por metro.
-const U=1/0.254, HA=2.05; // altura del centro de las anclas
-const POSES=[{p:[-1.5*U,0,1.5*U],ry:90},{p:[0,0,0],ry:0},{p:[1.5*U,0,1.5*U],ry:-90}];
+// MIA · Stand AR v4 — sin muros: el display completo (60x160 cm) es la imagen ancla y los mismos
+// elementos del stand anterior flotan a su alrededor. Coordenadas en METROS: display en el plano z=0,
+// x∈[-0.3,0.3], y∈[0.1,1.7] (centro a 0.9 m); el visitante está en +z.
+// Unidades MindAR = ancho de la imagen ancla (0.60 m) -> U unidades por metro.
+const U=1/0.6, HA=0.9; // altura del centro del display
+const POSES=[{p:[0,0,0],ry:0}];
 const WA='https://wa.me/524441749695?text=', TEL='tel:+524441749695', MAIL='mailto:danae@miaglobalconsulting.com';
 const wa=s=>WA+encodeURIComponent('Hola, vi el stand virtual de MIA y me interesa '+s);
 const O='#FF914C',K='#1F1F1F',W='#FFFFFF',CY='#9FF6FF';
@@ -18,15 +19,15 @@ const HOLOS=[ // muro, tipo, x(m, sobre el muro), y(m, altura), titulo, lineas, 
  [1,'engrane',1.05,1.75,'Organización',['Gobernanza, roles, indicadores y comunicación de impacto.','Lo que hace que el proyecto dure.'],'Hablar de mi equipo','fortalecer la organización de mi proyecto'],
  [1,'ciclo',1.05,0.95,'Ciclo de mejora',['Diagnosticar, planear, actuar, observar, mejorar.','Cada etapa con evidencia.'],'Iniciar diagnóstico','iniciar un diagnóstico']];
 const SOL=[ // soluciones (muro 3 y menú Soluciones)
- {k:'isla',n:'Islas Verdes',ico:'maceta',l:['Espacios verdes pequeños, de bajo mantenimiento, para oficinas, casas y empresas.','10 módulos y 5 sistemas combinables, como Huerto a la vista o Agua que riega sola.'],cta:'Quiero una Isla Verde',img:'img/serv0.jpg'},
- {k:'feria',n:'Feria del Huerto a la Mesa',ico:'zanahoria',l:['Circuito de 10 estaciones de la semilla al plato.','Su equipo aprende con las manos y cada persona se lleva algo vivo a casa.'],cta:'Llevar la feria a mi organización',img:'img/serv1.jpg'},
+ {k:'isla',n:'Puntos verdes',ico:'maceta',l:['Espacios verdes pequeños, de bajo mantenimiento, para oficinas, casas y empresas.','10 módulos y 5 sistemas combinables, como Huerto a la vista o Agua que riega sola.'],cta:'Quiero un Punto verde',img:'img/serv0.jpg'},
+ {k:'feria',n:'Feria de sostenibilidad',ico:'zanahoria',l:['Circuito de 10 estaciones de la semilla al plato.','Su equipo aprende con las manos y cada persona se lleva algo vivo a casa.'],cta:'Llevar la feria a mi organización',img:'img/serv1.jpg'},
  {k:'gallinero',n:'Gallinero inteligente',ico:'gallina',l:['Autoconsumo con tecnología pasiva: agua de lluvia, alimentación por gravedad, vermicomposta y respaldo solar.','Menos trabajo, más impacto.'],cta:'Cotizar gallinero',img:'img/serv2.jpg'},
  {k:'formacion',n:'Formación',ico:'libro',l:['Talleres y manuales propios para transferir la tecnología a su gente.','Basamos nuestro diseño curricular en metodologías CONOCER.'],cta:'Pedir programa de talleres',img:'img/serv3.jpg'},
  {k:'esg',n:'ESG / ODS',ico:'barras',l:['Indicadores, rutas de biodiversidad y comunicación de impacto que su consejo y su comunidad sí entienden.'],cta:'Revisar mis indicadores',img:'img/gal10.jpg'}];
 const MODULOS=['Espiral de aromáticas','Torre de lombrices','Jardín de polinizadores','Hotel de insectos benéficos','Captación de lluvia','Riego con ollas de barro','Riego por goteo','Cama elevada de cultivo','Macetohuerto reciclado','Rincón de convivencia'];
-const DIAG={Confianza:['Formación','Talleres y manuales para que las personas crean en el proceso.'],Coordinación:['Organización','Gobernanza, roles e indicadores para que cada actor sepa cómo actuar.'],Participación:['Feria del Huerto a la Mesa','Una experiencia con las manos que suma a todas las voces.'],Continuidad:['Islas Verdes','Módulos de bajo mantenimiento que siguen funcionando.']};
+const DIAG={Confianza:['Formación','Talleres y manuales para que las personas crean en el proceso.'],Coordinación:['Organización','Gobernanza, roles e indicadores para que cada actor sepa cómo actuar.'],Participación:['Feria de sostenibilidad','Una experiencia con las manos que suma a todas las voces.'],Continuidad:['Puntos verdes','Módulos de bajo mantenimiento que siguen funcionando.']};
 // ---------- utilidades ----------
-function el(t,a,p){const e=document.createElement(t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e;}
+function el(t,a,p){const e=document.createElement(t);for(const k in a)e.setAttribute(k,a[k]);if(a&&typeof a.position==='string')e.dataset.p=a.position;p&&p.appendChild(e);return e;}
 const FLAT=(c,op=1)=>`shader: flat; color: ${c}`+(op<1?`; transparent: true; opacity: ${op}; depthWrite: false`:'');
 const MAT=(c,r=.8)=>`color: ${c}; roughness: ${r}; metalness: 0`;
 const HOLO=(c=O,op=.9)=>`shader: flat; color: ${c}; wireframe: true; transparent: true; opacity: ${op}`;
@@ -47,51 +48,32 @@ function reactivo(r,o){r.setAttribute('animation__hin','property: scale; to: 1.1
  r.setAttribute('animation__hout','property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave');
  r.setAttribute('animation__pulso','property: scale; from: 1.3 1.3 1.3; to: 1 1 1; dur: 450; easing: easeOutElastic; startEvents: click');
  if(o){r.addEventListener('mouseenter',()=>o.setAttribute('animation','dur',1800));r.addEventListener('mouseleave',()=>o.setAttribute('animation','dur',8000));}}
-// grupo de un muro (coordenadas locales: x a lo largo del muro, y altura, z hacia el visitante)
-function muroG(sala,i){const P=[{p:'-1.5 0 1.5',r:90},{p:'0 0 0',r:0},{p:'1.5 0 1.5',r:-90}][i];return el('a-entity',{position:P.p,rotation:`0 ${P.r} 0`},sala);}
-// ---------- stand físico ----------
+// zona flotante: grupo en el aire, girado levemente hacia el visitante (sin muros)
+function zona(sala,x,y,z,ry,esc=1){return el('a-entity',{position:`${x} ${y} ${z}`,rotation:`0 ${ry} 0`,scale:`${esc} ${esc} ${esc}`},sala);}
+function flota(e,amp=.02,dur=2600){const p=e.getDOMAttribute?e.getDOMAttribute('position'):null;const pa=e.dataset.p.split(' ').map(Number);
+ e.setAttribute('animation__flota',`property: position; from: ${pa[0]} ${pa[1]-amp} ${pa[2]}; to: ${pa[0]} ${pa[1]+amp} ${pa[2]}; dir: alternate; loop: true; dur: ${dur}; easing: easeInOutSine`);return e;}
+// ---------- elementos del stand (los mismos de los muros), reacomodados en el aire ----------
 function standFisico(sala){
- // tarima + alfombra
- el('a-box',{width:3.1,height:.08,depth:3.1,position:'0 .04 1.5',material:MAT(K,.9)},sala);
- el('a-box',{width:2.9,height:.01,depth:2.9,position:'0 .085 1.5',material:MAT('#3B3B3B',1)},sala);
- el('a-box',{width:3.1,height:.03,depth:.02,position:'0 .06 3.06',material:FLAT(O)},sala);
- // muros-panel con marco y cabecera
- [0,1,2].forEach(i=>{const g=muroG(sala,i),M=MURO[i];
-  el('a-box',{width:3,height:2.5,depth:.06,position:'0 1.33 -.03',material:MAT('#F4F4F2',.95)},g);
-  [[0,2.58,3.04,.06],[0,.1,3.04,.06],[-1.5,1.33,.06,2.5],[1.5,1.33,.06,2.5]].forEach(([x,y,w,h])=>el('a-box',{width:w,height:h,depth:.08,position:`${x} ${y} -.01`,material:MAT(K,.6)},g));
-  el('a-image',{src:texCabecera('0'+(i+1),M.preg),width:3,height:.375,position:'0 2.75 0.02',material:'shader: flat'},g);
-  // el cartel (misma imagen que el impreso) en su lugar real: centro del ancla a 2.05 m
-  el('a-image',{src:`img/cartel_${['izq','fondo','der'][i]}.jpg`,width:.2794,height:.4318,position:`0 ${HA+0.011} 0.005`,material:'shader: flat'},g);
-  el('a-image',{src:texLetrero(M.t,M.s),width:1.5,height:.386,position:'0 1.6 0.01',material:'shader: flat'},g);
-  // luz de feria: lámpara + haz
-  [-0.9,0.9].forEach(x=>{el('a-cylinder',{radius:.04,height:.12,rotation:'60 0 0',position:`${x} 2.5 .1`,material:MAT(K,.4)},g);
-   el('a-cone',{'radius-bottom':.38,'radius-top':.03,height:1.1,'open-ended':true,'segments-radial':12,rotation:'-25 0 0',position:`${x} 1.98 .32`,material:FLAT('#FFF3E0',.07)+'; side: double'},g);});
- });
- // TV montada (muro de fondo, debajo del cartel)
- const f=muroG(sala,1);
- el('a-box',{width:1.12,height:.66,depth:.05,position:'0 1.05 .03',material:MAT('#111',.3)},f);
- const tv=el('a-video',{src:'#tv',width:1.06,height:.6,position:'0 1.05 .057',material:'shader: flat'},f);
+ const Z=[zona(sala,-1.12,0,.3,22,.52),zona(sala,0,0,.12,0,.62),zona(sala,1.12,0,.3,-22,.52)];window._Z=Z;
+ // cabeceras y letreros de las 3 zonas (antes en lo alto de cada muro)
+ const pos=[[0,3.75,3.3],[0,4.22,3.86],[0,3.75,3.3]];
+ [0,1,2].forEach(i=>{const M=MURO[i],[x,yc,yl]=pos[i];
+  flota(el('a-image',{src:texCabecera('0'+(i+1),M.preg),width:1.6,height:.2,position:`${x} ${yc} 0`,material:'shader: flat'},Z[i]),.02,3000+i*300);
+  flota(el('a-image',{src:texLetrero(M.t,M.s),width:1.5,height:.386,position:`${x} ${yl} 0`,material:'shader: flat'},Z[i]),.02,3200+i*300);});
+ // TV (antes en el muro de fondo): ahora flota sobre el display
+ const f=Z[1];
+ el('a-box',{width:1.12,height:.66,depth:.05,position:'0 3.07 -.03',material:MAT('#111',.3)},f);
+ const tv=el('a-video',{src:'#tv',width:1.06,height:.6,position:'0 3.07 0',material:'shader: flat'},f);
  clic(tv,()=>{const v=document.getElementById('tv');v.paused?v.play():v.pause();});
- window._sub=el('a-image',{src:texBoton(' ',{w:1060,h:110,bg:'rgba(0,0,0,0.75)',fg:W}),width:1.06,height:.11,position:'0 .8 .06',material:'shader: flat; transparent: true'},f);
- clic(el('a-image',{src:texBoton('Ver más casos',{w:700,h:130}),width:.5,height:.093,position:'0 .62 .06',material:'shader: flat'},f),()=>verCasos());
- // mostrador/recepción con logo al frente (esquina frontal derecha, mira al visitante)
- const m=el('a-entity',{position:'0.95 0.09 2.7'},sala);
- el('a-box',{width:0.9,height:1.0,depth:.45,position:'0 .5 0',material:MAT(W,.7)},m);
- el('a-box',{width:.96,height:.04,depth:.5,position:'0 1.02 0',material:MAT(K,.5)},m);
- el('a-box',{width:.9,height:.06,depth:.46,position:'0 .03 0',material:FLAT(O)},m);
- el('a-image',{src:'img/logo.jpg',width:.42,height:.4,position:'0 .58 .227',material:'shader: flat'},m);
- // repisa en muro izq con maceta y manual
- const iz=muroG(sala,0);
- el('a-box',{width:.9,height:.03,depth:.22,position:'-0.95 .85 .11',material:MAT(K,.5)},iz);
- el('a-cone',{'radius-bottom':.06,'radius-top':.08,height:.12,'segments-radial':10,position:'-1.2 .93 .12',material:MAT(O,.8)},iz);
- el('a-sphere',{radius:.07,'segments-width':8,'segments-height':6,position:'-1.2 1.03 .12',material:MAT('#5B8C3A',.9)},iz);
- [['#1F1F1F',0],[O,.05],[W,.1]].forEach(([c,dx],j)=>el('a-box',{width:.04,height:.22,depth:.16,position:`${-0.85+dx} .97 .12`,material:MAT(c,.7)},iz));
- // pedestales con productos (muro der): Isla Verde y gallinero
- const de=muroG(sala,2);
- window._ped=pedestal(de,-1.0,'Isla Verde');pedestal(de,-0.42,'Gallinero');
+ window._sub=el('a-image',{src:texBoton(' ',{w:1060,h:110,bg:'rgba(0,0,0,0.75)',fg:W}),width:1.06,height:.11,position:'0 2.71 .01',material:'shader: flat; transparent: true'},f);
+ clic(el('a-image',{src:texBoton('Ver más casos',{w:700,h:130}),width:.5,height:.093,position:'0 3.45 .02',material:'shader: flat'},f),()=>verCasos());
+ // pedestales con productos (antes al pie del muro derecho): flotan a la derecha, abajo
+ const de=Z[2];
+ window._ped=pedestal(de,-.45,'Punto verde');pedestal(de,.45,'Gallinero');
  islaVerde(window._ped.top,'despues');gallinero(de.querySelector('.ped-Gallinero'));
+ [...de.querySelectorAll('[class^=ped-]')].forEach((p,i)=>flota(p,.03,2800+i*400));
 }
-function pedestal(g,x,t){const p=el('a-entity',{position:`${x} 0.09 .45`,class:'ped-'+t},g);
+function pedestal(g,x,t){const p=el('a-entity',{position:`${x} 0.25 .2`,class:'ped-'+t},g);
  el('a-box',{width:.5,height:.6,depth:.5,position:'0 .3 0',material:MAT(W,.7)},p);el('a-box',{width:.52,height:.03,depth:.52,position:'0 .61 0',material:FLAT(O)},p);
  el('a-image',{src:texBoton(t,{w:600,h:120,bg:K,fg:W}),width:.4,height:.08,position:'0 .5 .252',material:'shader: flat'},p);
  const top=el('a-entity',{position:'0 .625 0'},p);return {p,top};}
@@ -146,29 +128,32 @@ function panelHolo(g,x,y,src,ancho=.62){const p=el('a-entity',{position:`${x} ${
  el('a-image',{src,width:ancho,height:ancho*.625,material:'shader: flat; transparent: true'},p);
  p.addEventListener('animationcomplete__out',()=>p.setAttribute('visible',false));return p;}
 function togglePanel(p,act){if(p.getAttribute('visible')){p.emit('cerrar');}else{p.setAttribute('visible',true);p.emit('abrir');act&&act();}}
-function capaHolo(sala){
- HOLOS.forEach(([w,tipo,x,y,tit,lin,cta,sol])=>{const g=muroG(sala,w);const h=holograma(g,x,y,tipo,tit);
-  const px=x<0?x+0.5:x-0.5; const pn=panelHolo(g,px,y,texPanel(tit,lin,cta));
-  h.addEventListener('click',()=>togglePanel(pn));clic(pn,()=>abrir(fichaGen(tit,lin,cta,sol)));});
- // Muro 3: soluciones
- const g3=muroG(sala,2);
- SOL.forEach((s,i)=>{const x=[-1.15,-0.65,-0.15,0.35,0.85][i],y=i%2?1.12:1.27;const h=holograma(g3,x,y,s.ico,s.n);
-  const pn=panelHolo(g3,Math.max(-0.85,Math.min(0.85,x)),y+0.55,texPanel(s.n,s.l,s.cta),.7);
-  h.addEventListener('click',()=>{g3.querySelectorAll('[data-sp]').forEach(o=>{if(o!==pn&&o.getAttribute('visible'))o.emit('cerrar');});togglePanel(pn);});pn.setAttribute('data-sp','');clic(pn,()=>abrir(ficha(i)));});
- // CTA "siguiente muro" al pie de cada muro
- [0,1,2].forEach(i=>{const g=muroG(sala,i);clic(el('a-image',{src:texBoton(MURO[i].sig,{w:1300,h:140}),width:.95,height:.102,position:`${i==2?0.25:0} ${i==1?0.42:i==2?0.42:0.62} .06`,material:'shader: flat'},g),()=>i<2?irMuro(i+1):menuContacto());});
- // Portarretratos (muro 1)
- const g1=muroG(sala,0);el('a-box',{width:.62,height:.48,depth:.03,position:'0.95 .98 .02',material:MAT(K,.4)},g1);
- const fr=el('a-image',{src:'img/gal0.jpg',width:.56,height:.42,position:'0.95 .98 .04',material:'shader: flat'},g1);let fi=0;
+function capaHolo(sala){const Z=window._Z;
+ // hologramas de "Quiénes somos" (zona izq) y "Cómo trabajamos" (alrededor del display)
+ const LUG=[[0,-.5,2.75],[0,.5,2.75],[1,-.88,2.45],[1,.88,2.45],[1,.88,1.45]];
+ HOLOS.forEach(([w,tipo,x0,y0,tit,lin,cta,sol],k)=>{const [zi,x,y]=LUG[k],g=Z[zi];const h=holograma(g,x,y,tipo,tit);
+  const px=zi==1?(x<0?x+.35:x-.35):0; const pn=panelHolo(g,px,y+.1,texPanel(tit,lin,cta));
+  h.addEventListener('click',()=>{cierraOtros(pn);togglePanel(pn);});pn.setAttribute('data-sp','');clic(pn,()=>abrir(fichaGen(tit,lin,cta,sol)));});
+ // Zona der: soluciones (mismas esferas)
+ const g3=Z[2];
+ SOL.forEach((s,i)=>{const x=[-.55,0,.55,-.28,.28][i],y=i<3?2.75:2.2;const h=holograma(g3,x,y,s.ico,s.n);
+  const pn=panelHolo(g3,0,y+.2,texPanel(s.n,s.l,s.cta),.7);
+  h.addEventListener('click',()=>{cierraOtros(pn);togglePanel(pn);});pn.setAttribute('data-sp','');clic(pn,()=>abrir(ficha(i)));});
+ // Portarretratos (zona izq)
+ const g1=Z[0];el('a-box',{width:.62,height:.48,depth:.03,position:'0 2.0 -.02',material:MAT(K,.4)},g1);
+ const fr=el('a-image',{src:'img/gal0.jpg',width:.56,height:.42,position:'0 2.0 0',material:'shader: flat'},g1);let fi=0;
  setInterval(()=>{fi=(fi+1)%12;fr.setAttribute('src',`img/gal${fi}.jpg`);},3500);clic(fr,()=>verCasos());
- // Interacciones de pedestal: Arma tu Isla Verde + Antes/Después
+ // Interacciones de pedestal: Arma tu Punto verde + Antes/Después
  const pd=window._ped.p;let antes=false;
- clic(el('a-image',{src:texBoton('Arma tu Isla Verde',{w:800,h:130}),width:.48,height:.078,position:'0 .36 .255',material:'shader: flat'},pd),()=>armaIsla());
+ clic(el('a-image',{src:texBoton('Arma tu Punto verde',{w:800,h:130}),width:.48,height:.078,position:'0 .36 .255',material:'shader: flat'},pd),()=>armaIsla());
  clic(el('a-image',{src:texBoton('Antes / Después',{w:800,h:130,bg:K,fg:W}),width:.48,height:.078,position:'0 .25 .255',material:'shader: flat'},pd),()=>{antes=!antes;islaVerde(window._ped.top,antes?'antes':'despues',window._sel);});
- // Mostrador: mini diagnóstico
- const m=el('a-entity',{position:'0.95 1.4 2.7'},sala);const h=holograma(m,0,0,'brujula','¿Qué necesita su proyecto?');h.addEventListener('click',()=>diagnostico());
+ // Diagnóstico (brújula, antes sobre el mostrador): flota a la izquierda, abajo
+ const h=holograma(g1,0,1.15,'brujula','¿Qué necesita su proyecto?');h.addEventListener('click',()=>diagnostico());
+ // Sitio MIA (ventana flotante con la última versión del sitio)
+ clic(el('a-image',{src:texBoton('Ver sitio MIA',{w:700,h:130,bg:K,fg:W}),width:.5,height:.093,position:'0 3.57 .02',material:'shader: flat'},Z[1]),()=>verSitio());
  plantasYFauna(sala);
 }
+function cierraOtros(pn){document.querySelectorAll('[data-sp]').forEach(o=>{if(o!==pn&&o.getAttribute('visible'))o.emit('cerrar');});}
 // ---------- plantas y fauna (discretas) ----------
 function plantasYFauna(sala){[[-1.3,.25],[1.3,.25],[-1.3,2.8],[-0.7,.2]].forEach(([x,z],i)=>{const p=el('a-entity',{position:`${x} .09 ${z}`},sala);
   el('a-cylinder',{radius:.09,height:.22,'segments-radial':10,position:'0 .11 0',material:MAT(i%2?K:W,.7)},p);
@@ -193,10 +178,10 @@ function menuRadial(g,x,y){const r=el('a-entity',{position:`${x} ${y} 0.3`},g);c
  hub.addEventListener('click',()=>{if(fan.getAttribute('visible'))fan.emit('cerrar');else{fan.setAttribute('visible',true);fan.emit('abrir');}});}
 // ---------- construir ----------
 function construirStand(stand){
- const sala=el('a-entity',{scale:`${U} ${U} ${U}`,position:`0 ${-HA*U} 0`},stand); // metros -> unidades del ancla
+ const sala=el('a-entity',{scale:`${U} ${U} ${U}`,position:`0 ${-HA*U} 0`},stand); // metros -> unidades del ancla (centro del display en el origen)
  el('a-entity',{light:'type: ambient; intensity: 0.75'},stand);el('a-entity',{light:'type: directional; intensity: 0.7',position:'1 3 2'},stand);
  standFisico(sala);capaHolo(sala);
- [[0,-0.95,0.45],[1,-1.05,0.95],[2,0.25,0.72]].forEach(([w,x,y])=>menuRadial(muroG(sala,w),x,y));
+ menuRadial(window._Z[1],-.88,1.45);
  fetch('config.json').then(r=>r.json()).then(c=>{const L=c.videos||[];let k=0;const v=document.getElementById('tv');if(!v||!L.length)return;
   const set=()=>{v.src=L[k].src;subt(L[k].subtitulos||[]);};set();if(L.length>1){v.loop=false;v.addEventListener('ended',()=>{k=(k+1)%L.length;set();v.play();});}}).catch(()=>{});
 }
@@ -205,7 +190,7 @@ let _st;function subt(arr){clearInterval(_st);if(!arr.length||!window._sub)retur
 AFRAME.registerComponent('fusion-stand',{init(){this.inv=POSES.map(P=>new THREE.Matrix4().compose(new THREE.Vector3(...P.p),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,THREE.MathUtils.degToRad(P.ry),0)),new THREE.Vector3(1,1,1)).invert());
   this.pos=new THREE.Vector3();this.q=new THREE.Quaternion();this.sc=new THREE.Vector3(1,1,1);this.has=false;this.lost=0;},
  tick(t,dt){const p=new THREE.Vector3(),q=new THREE.Quaternion(),sc=new THREE.Vector3();let n=0;const m=new THREE.Matrix4(),tp=new THREE.Vector3(),tq=new THREE.Quaternion(),ts=new THREE.Vector3();
-  [0,1,2].forEach(i=>{const e=document.getElementById('t'+i);if(!e||!e.object3D.visible)return;m.multiplyMatrices(e.object3D.matrixWorld,this.inv[i]);m.decompose(tp,tq,ts);
+  POSES.forEach((P,i)=>{const e=document.getElementById('t'+i);if(!e||!e.object3D.visible)return;m.multiplyMatrices(e.object3D.matrixWorld,this.inv[i]);m.decompose(tp,tq,ts);
    if(!(ts.x>1e-6)||[tq.x,tq.y,tq.z,tq.w,tp.x,tp.y,tp.z].some(v=>!isFinite(v)))return;tq.normalize();p.add(tp);sc.add(ts);if(n===0)q.copy(tq);else q.slerp(tq,1/(n+1));n++;});
   const o=this.el.object3D;if(n&&this.has&&![this.q.x,this.q.y,this.q.z,this.q.w,this.pos.x].every(isFinite))this.has=false;
   if(n){p.divideScalar(n);sc.divideScalar(n);if(!this.has){this.pos.copy(p);this.q.copy(q);this.sc.copy(sc);this.has=true;}else{this.pos.lerp(p,.3);this.q.slerp(q,.3);this.sc.lerp(sc,.3);}this.lost=0;o.visible=true;}
@@ -223,9 +208,10 @@ function menuVideos(){fetch('config.json').then(r=>r.json()).then(c=>abrir('<h2>
 function menuContacto(){abrir(`<h2>Cuéntenos su prioridad. Armamos juntos la ruta.</h2><p>Una conversación exploratoria de 20 minutos, sin compromiso.</p><p>${btnWA('WhatsApp','una conversación exploratoria')}</p><p><a class="btn" href="${TEL}">Llamar 444 174 9695</a></p><p><a class="btn k" href="${MAIL}">danae@miaglobalconsulting.com</a></p>`);}
 function diagnostico(){abrir('<h2>¿Qué necesita su proyecto?</h2><p>Un toque y le recomendamos por dónde empezar.</p>'+Object.keys(DIAG).map(k=>`<p><button onclick="diagRes('${k}')">${k}</button></p>`).join(''));}
 function diagRes(k){const [s,d]=DIAG[k];abrir(`<h2>${k}: le recomendamos ${s}</h2><p>${d}</p><p>${btnWA('Hablar de esto por WhatsApp',s+' (mi prioridad: '+k.toLowerCase()+')')}</p>`);}
-function armaIsla(){abrir('<h2>Arma tu Isla Verde</h2><p>Elija 2 o 3 módulos. Aparecen sobre el pedestal.</p>'+MODULOS.map((m,i)=>`<label class="chk"><input type="checkbox" value="${i}" onchange="selMod()"> ${m}</label>`).join('')+'<p id="cotIsla"></p>');}
+function armaIsla(){abrir('<h2>Arma tu Punto verde</h2><p>Elija 2 o 3 módulos. Aparecen sobre el pedestal.</p>'+MODULOS.map((m,i)=>`<label class="chk"><input type="checkbox" value="${i}" onchange="selMod()"> ${m}</label>`).join('')+'<p id="cotIsla"></p>');}
 function selMod(){const c=[...document.querySelectorAll('#pc input:checked')];if(c.length>3){c[c.length-1].checked=false;return selMod();}
  window._sel=c.map(x=>+x.value);islaVerde(window._ped.top,'despues',window._sel);
- document.getElementById('cotIsla').innerHTML=c.length?btnWA('Cotizar mi Isla Verde','una Isla Verde con: '+window._sel.map(i=>MODULOS[i]).join(', ')):'';}
+ document.getElementById('cotIsla').innerHTML=c.length?btnWA('Cotizar mi Punto verde','un Punto verde con: '+window._sel.map(i=>MODULOS[i]).join(', ')):'';}
+function verSitio(){const u='https://tortugadante.github.io/mia-global-consulting/';abrir(`<h2>Sitio MIA</h2><iframe src="${u}" title="Sitio MIA" style="width:100%;height:52vh;border:2px solid #1F1F1F;border-radius:8px" loading="lazy"></iframe><p><a class="btn" target="_blank" href="${u}">Abrir el sitio completo</a></p>`);}
 function verCasos(){abrir('<h2>Casos en campo</h2>'+[...Array(12).keys()].map(i=>`<img src="img/gal${i}.jpg" alt="">`).join('')+`<p>${btnWA('Ver más casos','casos de proyectos como estos')}</p>`);}
-function irMuro(i){const n=['Quiénes somos','Cómo trabajamos','Qué ofrecemos'][i];if(window.irA)window.irA(i);else{const e=document.getElementById('estado');if(e)e.textContent='Gire hacia el muro '+(i+1)+': '+n+' →';}}
+function irMuro(i){if(window.irA)window.irA(i);}
